@@ -1,4 +1,9 @@
+from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import ManyToManyField, ForeignKey, IntegerField
+from django.db.models.constraints import UniqueConstraint
+from settings import AUTH_USER_MODEL
 
 
 class Genre(models.Model):
@@ -17,7 +22,7 @@ class Actor(models.Model):
 
 
 class Movie(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, db_index=True)
     description = models.TextField()
     actors = models.ManyToManyField(to=Actor, related_name="movies")
     genres = models.ManyToManyField(to=Genre, related_name="movies")
@@ -50,3 +55,53 @@ class MovieSession(models.Model):
 
     def __str__(self) -> str:
         return f"{self.movie.title} {str(self.show_time)}"
+
+
+class User(AbstractUser):
+    pass
+
+
+class Order(models.Model):
+    # need User model
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __repr__(self):
+        return f"{self.created_at.date()} {self.created_at.time}"
+
+
+class Ticket(models.Model):
+    movie_session = ForeignKey(MovieSession, on_delete=models.CASCADE)
+    order = ForeignKey(Order, on_delete=models.CASCADE)
+    row = IntegerField()
+    seat = IntegerField()
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=["row", "seat", "movie_session"],
+                name="Uniq_row_and_seat"
+            )
+        ]
+
+    def clean(self):
+        if not (
+                (self.row <= self.movie_session.cinema_hall.rows) and
+                (self.seat <= self.movie_session.cinema_hall.seats_in_row)
+        ):
+            raise ValidationError(f"Not correct row or seat!")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+
+    def __repr__(self):
+        return (f"{self.movie_session.movie.title} {self.movie_session.show_time.date} {self.movie_session.show_time.time}"
+                f"(row: {self.row}, seat: {self.seat}")
+
+
+
