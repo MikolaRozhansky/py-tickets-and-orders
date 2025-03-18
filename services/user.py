@@ -7,18 +7,19 @@ from django.db.models import QuerySet
 def create_user(
         username: str,
         password: str,
-        email: str = None,
-        first_name: str = None,
-        last_name: str = None
+        email: str = "",
+        first_name: str = "",
+        last_name: str = ""
 ) -> QuerySet:
-    return get_user_model().objects.create_user(
-        username=username,
-        email=email,
-        password=password,
-        first_name=first_name,
-        last_name=last_name
 
-    )
+    return get_user_model().objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name
+
+        )
 
 def get_user(user_id: int):
     return get_user_model().objects.get(pk=user_id)
