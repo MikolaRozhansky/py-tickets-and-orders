@@ -1,7 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
 from django.db.models import QuerySet
-
 
 
 def create_user(
@@ -13,24 +11,25 @@ def create_user(
 ) -> QuerySet:
 
     return get_user_model().objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name
+        username=username,
+        email=email,
+        password=password,
+        first_name=first_name,
+        last_name=last_name
+    )
 
-        )
 
-def get_user(user_id: int):
+def get_user(user_id: int) -> object:
     return get_user_model().objects.get(pk=user_id)
 
+
 def update_user(
-    user_id: int,
-    username: str = None,
-    password: str = None,
-    email: str = None,
-    first_name: str = None,
-    last_name: str = None):
+        user_id: int,
+        username: str = None,
+        password: str = None,
+        email: str = None,
+        first_name: str = None,
+        last_name: str = None) -> None:
 
     user = get_user(user_id)
 
@@ -50,5 +49,3 @@ def update_user(
         user.last_name = last_name
 
     user.save()
-
-

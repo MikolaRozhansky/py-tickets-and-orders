@@ -1,8 +1,6 @@
-import datetime
-
 from django.db.models import QuerySet
 
-from db.models import MovieSession, Ticket, Order
+from db.models import Ticket, Order
 from django.contrib.auth import get_user_model
 from django.db import transaction
 
@@ -10,9 +8,9 @@ from django.db import transaction
 def create_order(
         tickets: list,
         username: str,
-        date: str=None
+        date: str = None
 
-):
+) -> None:
     with transaction.atomic():
         # find_user = get_user_model().objects.get(username=username)
         # new_order = Order.objects.create(
@@ -21,11 +19,12 @@ def create_order(
         # # new_order.save()
         # if date:
         #     print(date)
-        #     # new_order.created_at = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M")
+        #     # new_order.created_at = datetime.datetime.strptime(
+        #     date, "%Y-%m-%d %H:%M"
+        #     )
         #     print(new_order)
         #     Order.objects.filter(pk=new_order.id).update(created_at=date)
         #     print(new_order)
-
 
         new_order = Order.objects.create(
             user=get_user_model().objects.get(username=username)
@@ -33,13 +32,14 @@ def create_order(
 
         if date:
             print(date)
-            # new_order.created_at = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M")
+            # new_order.created_at = datetime.datetime.strptime(
+            # date, "%Y-%m-%d %H:%M"
+            # )
             print(new_order)
             Order.objects.filter(pk=new_order.id).update(created_at=date)
             print(new_order)
 
-
-        out_ticket = []
+        # out_ticket = []
         print(tickets)
 
         # for ticket in tickets:
@@ -66,9 +66,8 @@ def create_order(
                 row=ticket["row"],
                 seat=ticket["seat"]
             )
-
-
         # Ticket.objects.bulk_create(out_ticket)
+
 
 def get_orders(
         username: str = None
@@ -78,4 +77,3 @@ def get_orders(
     if username:
         queryset = queryset.filter(user__username=username)
     return queryset
-
