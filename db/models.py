@@ -73,8 +73,6 @@ class Order(models.Model):
         ordering = ["-created_at"]
 
 
-
-
 class Ticket(models.Model):
     movie_session = ForeignKey(MovieSession, on_delete=models.CASCADE)
     order = ForeignKey(Order, on_delete=models.CASCADE)
